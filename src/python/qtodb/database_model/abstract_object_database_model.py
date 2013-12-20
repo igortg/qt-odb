@@ -9,12 +9,11 @@ from qtodb.decorators import not_implemented
 AttributeDisplay = namedtuple("AttributeDisplay", ["attr_name", "header_caption", "format"])
 
 
-class AbstractObjectDatabaseModel(QAbstractTableModel):
+class AbstractObjectModel(QAbstractTableModel):
 
 
-    def __init__(self, internal_container, object_factory, parent=None):
+    def __init__(self, internal_container, parent=None):
         QAbstractTableModel.__init__(self, parent)
-        self._object_factory = object_factory
         self._internal_container = internal_container
         self._object_attributes = []
 
@@ -22,6 +21,11 @@ class AbstractObjectDatabaseModel(QAbstractTableModel):
     def addAttributeColumn(self, attr_name, header_caption, format_str=None):
         object_display = AttributeDisplay(attr_name, header_caption, format_str)
         self._object_attributes.append(object_display)
+
+
+    def setInternalContainer(self, internal_container):
+        self._internal_container = internal_container
+        self.reset()
 
 
     @not_implemented
@@ -37,15 +41,6 @@ class AbstractObjectDatabaseModel(QAbstractTableModel):
     @not_implemented
     def __getitem__(self, index):
         pass
-
-
-    def newObject(self):
-        objects_count = len(self._internal_container)
-        self.beginInsertRows(QModelIndex(), objects_count, objects_count)
-        instance = self._object_factory()
-        self._appendToInternalContainer(instance)
-        self.endInsertRows()
-        return instance
 
 
     def appendObject(self, instance):
@@ -86,7 +81,7 @@ class AbstractObjectDatabaseModel(QAbstractTableModel):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self._object_attributes[column][1]
         else:
-            return super(AbstractObjectDatabaseModel, self).headerData(column, orientation, role)
+            return super(AbstractObjectModel, self).headerData(column, orientation, role)
 
 
     def updateDisplay(self, index):

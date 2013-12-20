@@ -1,18 +1,14 @@
 from contextlib import contextmanager
 import transaction
-from qtodb.database_model.abstract_object_database_model import AbstractObjectDatabaseModel
+from qtodb.database_model.abstract_object_database_model import AbstractObjectModel
 
 
 
-class ObjectBTreeDatabaseModel(AbstractObjectDatabaseModel):
+class ObjectBTreeDatabaseModel(AbstractObjectModel):
 
-    def __init__(self, internal_container, object_factory, parent=None):
-        super(ObjectBTreeDatabaseModel, self).__init__(internal_container, object_factory, parent)
+    def __init__(self, internal_container, parent=None):
+        super(ObjectBTreeDatabaseModel, self).__init__(internal_container, parent)
         self._key_attribute = None
-        if len(internal_container):
-            self._item_counter = max(internal_container.keys())
-        else:
-            self._item_counter = 0
 
 
     def setKeyAttribute(self, attribute_name):
@@ -27,8 +23,11 @@ class ObjectBTreeDatabaseModel(AbstractObjectDatabaseModel):
     def _appendToInternalContainer(self, item):
         assert self._key_attribute is not None, \
             "set an attribute to be used as key with {0}".format(self.setKeyAttribute.func_name)
-        self._item_counter += 1
-        key = self._item_counter
+        #TODO: Store a container counter somewhere in the Database?
+        if len(self._internal_container):
+            key = self._internal_container.keys()[-1] + 1
+        else:
+            key = 1
         setattr(item, self._key_attribute, key)
         self._internal_container[key] = item
 
