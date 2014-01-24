@@ -68,9 +68,14 @@ class AbstractObjectModel(QAbstractTableModel):
         if role in [Qt.DisplayRole, Qt.EditRole]:
             object_display = self._object_attributes[model_index.column()]
             instance = self[model_index.row()]
-            value = getattr(instance, object_display.attr_name)
+            if hasattr(instance, object_display.attr_name):
+                value = getattr(instance, object_display.attr_name)
+            else:
+                value = ""
             if object_display.format:
                 return object_display.format(value)
+            elif isinstance(value, (str, unicode)):
+                return value
             else:
                 return str(value)
         else:

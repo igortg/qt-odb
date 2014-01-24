@@ -4,11 +4,12 @@ from qtodb.database_model.abstract_object_database_model import AbstractObjectMo
 
 
 
-class ObjectBTreeDatabaseModel(AbstractObjectModel):
+class ZodbDatabaseModel(AbstractObjectModel):
 
     def __init__(self, internal_container, parent=None):
-        super(ObjectBTreeDatabaseModel, self).__init__(internal_container, parent)
+        super(ZodbDatabaseModel, self).__init__(internal_container, parent)
         self._key_attribute = None
+        self._current_transaction = None
 
 
     def setKeyAttribute(self, attribute_name):
@@ -21,6 +22,7 @@ class ObjectBTreeDatabaseModel(AbstractObjectModel):
 
 
     def _appendToInternalContainer(self, item):
+        assert self._current_transaction is not None, "No transaction currently opened"
         assert self._key_attribute is not None, \
             "set an attribute to be used as key with {0}".format(self.setKeyAttribute.func_name)
         #TODO: Store a container counter somewhere in the Database?
@@ -33,6 +35,7 @@ class ObjectBTreeDatabaseModel(AbstractObjectModel):
 
 
     def _removeFromInternalContainer(self, index):
+        assert self._current_transaction is not None, "No transaction currently opened"
         assert self._key_attribute is not None,\
             "set an attribute to be used as key with {0}".format(self.setKeyAttribute.func_name)
         instance = self[index]
@@ -62,19 +65,20 @@ class ObjectBTreeDatabaseModel(AbstractObjectModel):
         If you want to abort the transaction inside this context, raise TransactionAbort exception (transaction
         object doesn't have an "Aborted" state, so transaction.abort() souldn't be used
         """
-        trans = transaction.get()
+        self._current_transaction = trans = transaction.get()
         try:
             yield trans
+            self._internal_container._p_changed = True
+            trans.commit()
         except TransactionAbort:
             trans.abort()
         except:
             trans.abort()
             raise
-        else:
-            self._internal_container._p_changed = True
-            if resetModel:
-                self.reset()
-            trans.commit()
+        finally:
+            self._current_transaction = None
+        if resetModel:
+            self.reset()
 
 
     @contextmanager

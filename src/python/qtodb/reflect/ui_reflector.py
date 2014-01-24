@@ -13,7 +13,7 @@ class UiReflector(object):
         assert isinstance(instance, Reflective)
 
         def updateUi(value):
-            widget.setText(str(value))
+            widget.setText(value)
 
         def updateData():
             value = widget.text()
@@ -49,9 +49,3 @@ class UiReflector(object):
         widget.disconnect(widget)
         for instance, updateUi, updateData in self._reflections[widget]:
             instance.UnregisterReflection(updateUi)
-
-
-class Holder(object):
-    def __init__(self, update_ui, update_data):
-        self._update_ui = update_ui
-        self._update_data = update_data

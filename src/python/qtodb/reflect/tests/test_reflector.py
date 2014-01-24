@@ -69,7 +69,7 @@ def test_locale_reflection(qtbot):
         edit.show()
         instance = Dummy()
         reflector = UiReflector()
-        reflector.line_float(edit, instance, "number")
+        reflector.li    ne_float(edit, instance, "number")
         qtbot.keyClicks(edit, "2,3")
         qtbot.keyClick(edit, Qt.Key_Enter)
         assert instance.number == 2.3
