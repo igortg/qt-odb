@@ -45,7 +45,10 @@ class UiReflector(object):
         widget_reflections.append((instance, updateUi, updateData))
 
 
-    def disconnect(self, widget):
+    def disconnect(self, widget, instance=None):
         widget.disconnect(widget)
-        for instance, updateUi, updateData in self._reflections[widget]:
-            instance.UnregisterReflection(updateUi)
+        for reflective, updateUi, updateData in self._reflections[widget]:
+            if instance is None:
+                reflective.UnregisterReflection(updateUi)
+            elif instance is reflective:
+                reflective.UnregisterReflection(updateUi)

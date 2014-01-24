@@ -38,7 +38,7 @@ def test_text_reflection(qtbot):
     assert instance1.text == "UI Text"
     assert instance2.text == "UI Text 2"
 
-    reflector.disconnect(edit1)
+    reflector.disconnect(edit1, instance1)
     instance1.text = "Disconnected"
     assert edit1.text() == "UI Text"
 
@@ -69,7 +69,7 @@ def test_locale_reflection(qtbot):
         edit.show()
         instance = Dummy()
         reflector = UiReflector()
-        reflector.li    ne_float(edit, instance, "number")
+        reflector.line_float(edit, instance, "number")
         qtbot.keyClicks(edit, "2,3")
         qtbot.keyClick(edit, Qt.Key_Enter)
         assert instance.number == 2.3
