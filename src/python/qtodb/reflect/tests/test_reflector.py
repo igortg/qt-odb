@@ -38,7 +38,7 @@ def test_text_reflection(qtbot):
     assert instance1.text == "UI Text"
     assert instance2.text == "UI Text 2"
 
-    reflector.disconnect(edit1, instance1)
+    reflector.disconnect(instance1)
     instance1.text = "Disconnected"
     assert edit1.text() == "UI Text"
 

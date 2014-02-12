@@ -24,8 +24,8 @@ class UiReflector(object):
         updateUi(getattr(instance, attr_name))
         instance.RegisterAttributeReflection(attr_name, updateUi)
         QObject.connect(widget, SIGNAL("editingFinished()"), updateData)
-        widget_reflections = self._reflections.setdefault(widget, [])
-        widget_reflections.append((instance, updateUi, updateData))
+        widget_reflections = self._reflections.setdefault(instance, [])
+        widget_reflections.append((widget, updateUi, updateData))
 
 
     def line_float(self, widget, instance, attr_name):
@@ -41,14 +41,11 @@ class UiReflector(object):
         updateUi(getattr(instance, attr_name))
         instance.RegisterAttributeReflection(attr_name, updateUi)
         QObject.connect(widget, SIGNAL("editingFinished()"), updateData)
-        widget_reflections = self._reflections.setdefault(widget, [])
-        widget_reflections.append((instance, updateUi, updateData))
+        widget_reflections = self._reflections.setdefault(instance, [])
+        widget_reflections.append((widget, updateUi, updateData))
 
 
-    def disconnect(self, widget, instance=None):
-        widget.disconnect(widget)
-        for reflective, updateUi, updateData in self._reflections[widget]:
-            if instance is None:
-                reflective.UnregisterReflection(updateUi)
-            elif instance is reflective:
-                reflective.UnregisterReflection(updateUi)
+    def disconnect(self, instance):
+        for widget, updateUi, updateData in self._reflections[instance]:
+            instance.UnregisterReflection(updateUi)
+            QObject.disconnect(widget, SIGNAL("editingFinished()"), updateData)
