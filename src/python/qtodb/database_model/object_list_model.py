@@ -12,3 +12,7 @@ class ObjectListModel(AbstractObjectModel):
 
     def __getitem__(self, index):
         return self._internal_container[index]
+
+
+    def objectIndex(self, instance):
+        return self._internal_container.index(instance)

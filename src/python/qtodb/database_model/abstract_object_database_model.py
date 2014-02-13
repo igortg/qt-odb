@@ -43,6 +43,11 @@ class AbstractObjectModel(QAbstractTableModel):
         pass
 
 
+    @not_implemented
+    def objectIndex(self, instance):
+        pass
+
+
     def appendObject(self, instance):
         objects_count = len(self._internal_container)
         self.beginInsertRows(QModelIndex(), objects_count, objects_count)

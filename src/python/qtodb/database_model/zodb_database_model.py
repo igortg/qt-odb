@@ -48,6 +48,14 @@ class ZodbDatabaseModel(AbstractObjectModel):
         return values[index]
 
 
+    def objectIndex(self, instance):
+        for key, item in self._internal_container.iteritems():
+            if item == instance:
+                return key
+        else:
+            raise ValueError("{0} is not in the model".format(instance))
+
+
     def getObjectByKey(self, key):
         return self._internal_container[key]
 
