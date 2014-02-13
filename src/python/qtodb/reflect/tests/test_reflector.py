@@ -1,14 +1,16 @@
 from PySide.QtCore import Qt
-from PySide.QtGui import QLineEdit
+from PySide.QtGui import QLineEdit, QComboBox
+from qtodb.database_model.object_list_model import ObjectListModel
 from qtodb.reflect.reflective import Reflective
 from qtodb.reflect.ui_reflector import UiReflector
 
 
 class Dummy(Reflective):
-    def __init__(self):
+    def __init__(self, text="", number=0.0):
         super(Dummy, self).__init__()
-        self.text = ""
-        self.number = 0.0
+        self.text = text
+        self.number = number
+        self.other = None
 
 
 def test_text_reflection(qtbot):
@@ -75,3 +77,24 @@ def test_locale_reflection(qtbot):
         assert instance.number == 2.3
     finally:
         locale.resetlocale()
+
+
+def test_combo_reflection(qtbot):
+    options = ObjectListModel([])
+    options.addAttributeColumn("text", "Text")
+    options.addAttributeColumn("number", "Number")
+    options.appendObject(Dummy("Zero", 0))
+    options.appendObject(Dummy("One", 1))
+    options.appendObject(Dummy("Two", 2))
+
+    combo = QComboBox()
+    combo.setModel(options)
+    qtbot.addWidget(combo)
+    combo.show()
+    instance = Dummy()
+    instance.other = options[2]
+    reflector = UiReflector()
+    reflector.combo_model(combo, instance, "other")
+    assert combo.currentText() == "Two"
+    qtbot.keyClick(combo, "O")
+    assert instance.other.text == "One"

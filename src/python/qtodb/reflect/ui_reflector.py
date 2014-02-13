@@ -45,6 +45,28 @@ class UiReflector(object):
         widget_reflections.append((widget, updateUi, updateData))
 
 
+    def combo_model(self, widget, instance, attr_name):
+        assert isinstance(instance, Reflective)
+
+        def updateUi(value):
+            try:
+                index = widget.model().objectIndex(value)
+            except ValueError:
+                widget.setCurrentIndex(-1)
+            else:
+                widget.setCurrentIndex(index)
+
+        def updateData(index):
+            value = widget.model()[index]
+            setattr(instance, attr_name, value)
+
+        updateUi(getattr(instance, attr_name))
+        instance.RegisterAttributeReflection(attr_name, updateUi)
+        QObject.connect(widget, SIGNAL("currentIndexChanged(int)"), updateData)
+        widget_reflections = self._reflections.setdefault(instance, [])
+        widget_reflections.append((widget, updateUi, updateData))
+
+
     def disconnect(self, instance):
         for widget, updateUi, updateData in self._reflections[instance]:
             instance.UnregisterReflection(updateUi)
