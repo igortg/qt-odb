@@ -1,5 +1,6 @@
 from PySide.QtCore import SIGNAL, QObject
 import locale
+import datetime
 from qtodb.reflect.reflective import Reflective
 
 
@@ -65,6 +66,25 @@ class UiReflector(object):
         QObject.connect(widget, SIGNAL("currentIndexChanged(int)"), updateData)
         widget_reflections = self._reflections.setdefault(instance, [])
         widget_reflections.append((widget, updateUi, updateData))
+
+
+    def date(self, widget, instance, attr_name):
+        assert isinstance(instance, Reflective)
+
+        def updateUi(value):
+            widget.setDate(value.year, value.month, value.day)
+
+        def updateData(index):
+            qdate = widget.date()
+            value = datetime.date(qdate.year(), qdate.month(), qdate.day())
+            setattr(instance, attr_name, value)
+
+        updateUi(getattr(instance, attr_name))
+        instance.RegisterAttributeReflection(attr_name, updateUi)
+        QObject.connect(widget, SIGNAL("dateChanged(QDate)"), updateData)
+        widget_reflections = self._reflections.setdefault(instance, [])
+        widget_reflections.append((widget, updateUi, updateData))
+
 
 
     def disconnect(self, instance):
