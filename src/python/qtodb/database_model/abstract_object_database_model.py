@@ -76,7 +76,7 @@ class AbstractObjectModel(QAbstractTableModel):
             if hasattr(instance, object_display.attr_name):
                 value = getattr(instance, object_display.attr_name)
             else:
-                value = ""
+                value = "<N/A>"
             if object_display.format:
                 return object_display.format(value)
             elif isinstance(value, (str, unicode)):
