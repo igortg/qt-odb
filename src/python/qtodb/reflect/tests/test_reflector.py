@@ -1,5 +1,6 @@
-from PySide.QtCore import Qt
-from PySide.QtGui import QLineEdit, QComboBox
+from PySide.QtCore import Qt, QDate
+from PySide.QtGui import QLineEdit, QComboBox, QDateEdit
+import datetime
 from qtodb.database_model.object_list_model import ObjectListModel
 from qtodb.reflect.reflective import Reflective
 from qtodb.reflect.ui_reflector import UiReflector
@@ -11,6 +12,7 @@ class Dummy(Reflective):
         self.text = text
         self.number = number
         self.other = None
+        self.date = datetime.date(1990, 1, 1)
 
 
 def test_text_reflection(qtbot):
@@ -98,3 +100,15 @@ def test_combo_reflection(qtbot):
     assert combo.currentText() == "Two"
     qtbot.keyClick(combo, "O")
     assert instance.other.text == "One"
+
+
+def test_date_reflection(qtbot):
+    date_widget = QDateEdit()
+    qtbot.addWidget(date_widget)
+    date_widget.show()
+    dummy= Dummy()
+    reflector = UiReflector()
+    reflector.date(date_widget, dummy, "date")
+    assert date_widget.date() == QDate(dummy.date.year, dummy.date.month, dummy.date.day)
+    qtbot.keyClicks(date_widget, "09041982")
+    assert dummy.date == datetime.date(1982, 4, 9)
