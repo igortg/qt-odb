@@ -43,9 +43,12 @@ class ZodbDatabaseModel(AbstractObjectModel):
         del self._internal_container[key]
 
 
+    def values(self):
+        return self._internal_container.values()
+
+
     def __getitem__(self, index):
-        values = self._internal_container.values()
-        return values[index]
+        return self.values()[index]
 
 
     def objectIndex(self, instance):
