@@ -53,9 +53,8 @@ class UiReflector(object):
             try:
                 index = widget.model().objectIndex(value)
             except ValueError:
-                widget.setCurrentIndex(-1)
-            else:
-                widget.setCurrentIndex(index)
+                index = -1
+            widget.setCurrentIndex(index)
 
         def updateData(index):
             value = widget.model()[index]
