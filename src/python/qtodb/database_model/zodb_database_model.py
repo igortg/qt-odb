@@ -53,7 +53,7 @@ class ZodbDatabaseModel(AbstractObjectModel):
 
     def objectIndex(self, instance):
         for index, item in enumerate(self._internal_container.itervalues()):
-            if item == instance:
+            if item.uid == instance.uid:
                 return index
         else:
             raise ValueError("{0} is not in the model".format(instance))
