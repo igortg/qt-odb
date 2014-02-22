@@ -90,4 +90,5 @@ class UiReflector(object):
     def disconnect(self, instance):
         for widget, updateUi, updateData in self._reflections[instance]:
             instance.UnregisterReflection(updateUi)
-            QObject.disconnect(widget, SIGNAL("editingFinished()"), updateData)
+            #TODO: disconnect the correct signal
+            QObject.disconnect(widget)
