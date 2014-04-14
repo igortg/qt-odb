@@ -4,7 +4,7 @@ from PySide.QtCore import Qt
 from ZODB import DB
 from ZODB.FileStorage import FileStorage
 from qtodb.database_model.zodb_database_model import ZodbDatabaseModel
-from qtodb.database_model.tests.fixtures import Dummy, ModelIndexMock
+from qtodb.database_model.tests.fixtures import Dummy, ModelIndexDuck
 
 
 def create_dummy_database_model(container):
@@ -23,13 +23,13 @@ def test_zodb_database_model():
         dummy.number = i
         with db_model.openTransaction():
             db_model.appendObject(dummy)
-    assert db_model.data(ModelIndexMock(0,0), Qt.DisplayRole) == "1"
-    assert db_model.data(ModelIndexMock(1,1), Qt.DisplayRole) == "Object2"
+    assert db_model.data(ModelIndexDuck(0,0), Qt.DisplayRole) == "1"
+    assert db_model.data(ModelIndexDuck(1,1), Qt.DisplayRole) == "Object2"
     dummy1 = db_model.getObjectByKey(1)
     assert dummy1.text == "Object1"
     with db_model.openTransaction():
         db_model.removeObject(0)
-    assert db_model.data(ModelIndexMock(0,0), Qt.DisplayRole) == "2"
+    assert db_model.data(ModelIndexDuck(0,0), Qt.DisplayRole) == "2"
     dummy5 = Dummy()
     with db_model.openTransaction():
         db_model.appendObject(dummy5)

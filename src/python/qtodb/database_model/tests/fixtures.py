@@ -5,7 +5,10 @@ class Dummy(object):
         self.integer = integer
 
 
-class ModelIndexMock():
+class ModelIndexDuck:
+    """
+    Duck type QModelIndex, since we can't assign row and column values on QModelIndex instances
+    """
 
     def __init__(self, row, col):
         self._row = row

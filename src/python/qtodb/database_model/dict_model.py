@@ -4,9 +4,15 @@ from persistent.mapping import PersistentMapping
 
 
 class DictModel(QAbstractTableModel):
-    def __init__(self, internal_container=PersistentMapping, parent=None):
+    def __init__(self, internal_container=None, parent=None):
         QAbstractTableModel.__init__(self, parent)
-        self._internal_container = internal_container
+        # Set default internal container
+        self._header_display = ("Key", "Value")
+        if internal_container:
+            self._internal_container = PersistentMapping()
+        else:
+            self._internal_container = internal_container
+
 
 
     def __getitem__(self, key):
@@ -26,7 +32,7 @@ class DictModel(QAbstractTableModel):
 
 
     def columnCount(self, QModelIndex_parent=None, *args, **kwargs):
-        return len(2)
+        return 2
 
 
     def data(self, model_index, role):
@@ -35,13 +41,14 @@ class DictModel(QAbstractTableModel):
                 keys = self._internal_container.keys()
                 return keys[model_index.row()]
             elif model_index.column() == 1:
-                return self._internal_container[model_index.row()]
+                values = self._internal_container.values()
+                return values[model_index.row()]
         else:
-            return super(QAbstractTableModel, self).data(model_index, role)
+            return None
 
 
     def headerData(self, column, orientation, role=None):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            return self._object_attributes[column][1]
+            return self._header_display[column]
         else:
-            return super(QAbstractTableModel, self).headerData(column, orientation, role)
+            return None
