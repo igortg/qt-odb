@@ -1,3 +1,4 @@
+from persistent.mapping import PersistentMapping
 import transaction
 from BTrees.IOBTree import IOBTree
 from PySide.QtCore import Qt

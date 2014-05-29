@@ -1,10 +1,8 @@
-from contextlib import contextmanager
-import transaction
 from qtodb.database_model.abstract_object_database_model import AbstractObjectModel
+from qtodb.database_model.transaction_context_manager import TransactionContextManager
 
 
-
-class ZodbDatabaseModel(AbstractObjectModel):
+class ZodbDatabaseModel(AbstractObjectModel, TransactionContextManager):
 
     def __init__(self, internal_container, parent=None):
         super(ZodbDatabaseModel, self).__init__(internal_container, parent)
@@ -22,7 +20,7 @@ class ZodbDatabaseModel(AbstractObjectModel):
 
 
     def _appendToInternalContainer(self, item):
-        assert self._current_transaction is not None, "No transaction currently opened"
+        self._assertOpenTransaction()
         assert self._key_attribute is not None, \
             "set an attribute to be used as key with {0}".format(self.setKeyAttribute.func_name)
         #TODO: Store a container counter somewhere in the Database?
@@ -35,7 +33,7 @@ class ZodbDatabaseModel(AbstractObjectModel):
 
 
     def _removeFromInternalContainer(self, index):
-        assert self._current_transaction is not None, "No transaction currently opened"
+        self._assertOpenTransaction()
         assert self._key_attribute is not None,\
             "set an attribute to be used as key with {0}".format(self.setKeyAttribute.func_name)
         instance = self[index]
@@ -61,64 +59,3 @@ class ZodbDatabaseModel(AbstractObjectModel):
 
     def getObjectByKey(self, key):
         return self._internal_container[key]
-
-
-    @contextmanager
-    def openTransaction(self, resetModel=True):
-        """
-        Context manager to update the Model. Responsable for set the dirty bit on the internal container and
-        commit or abort the transaction.
-
-        with model.openTransaction():
-            instance = model[0]
-            ... modify instance ...
-
-        If you want to abort the transaction inside this context, raise TransactionAbort exception (transaction
-        object doesn't have an "Aborted" state, so transaction.abort() souldn't be used
-        """
-        self._current_transaction = trans = transaction.get()
-        try:
-            yield trans
-            self._internal_container._p_changed = True
-            trans.commit()
-        except TransactionAbort:
-            trans.abort()
-        except:
-            trans.abort()
-            raise
-        finally:
-            self._current_transaction = None
-        if resetModel:
-            self.reset()
-
-
-    @contextmanager
-    def getForEdition(self, index):
-        """
-        Context manager to modify an instance from the model. Responsable for set the dirty bit on the internal
-        container, emit "dataChanged" signal and commit or abort the transaction
-
-        with model.getForEdition(0) as instance:
-            ... modify instance ...
-
-        If you want to abort the transaction inside this context, raise TransactionAbort exception (transaction
-        object doesn't have an "Aborted" state, so transaction.abort() souldn't be used
-
-        :param int index: object index in the model
-        """
-        trans = transaction.get()
-        try:
-            yield self[index]
-        except TransactionAbort:
-            trans.abort()
-        except:
-            trans.abort()
-            raise
-        else:
-            self._internal_container._p_changed = True
-            self.updateDisplay(index)
-            trans.commit()
-
-
-class TransactionAbort(BaseException):
-    pass
