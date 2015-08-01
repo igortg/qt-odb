@@ -1,7 +1,7 @@
 from PySide.QtCore import Qt, QDate
 from PySide.QtGui import QLineEdit, QComboBox, QDateEdit
 import datetime
-from qtodb.database_model.object_list_model import ObjectListModel
+from qtodb.database_model.objectlistmodel import ObjectListModel
 from qtodb.reflect.reflective import Reflective
 from qtodb.reflect.ui_reflector import UiReflector
 

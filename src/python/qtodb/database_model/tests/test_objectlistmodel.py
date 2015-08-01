@@ -1,9 +1,9 @@
 from PySide.QtCore import Qt
-from qtodb.database_model.object_list_model import ObjectListModel
+from qtodb.database_model.objectlistmodel import ObjectListModel
 from qtodb.database_model.tests.fixtures import Dummy, ModelIndexDuck
 
 
-def test_database_table_model():
+def test_model_data():
     model = ObjectListModel([], None)
     model.addAttributeColumn("number", "Number")
     model.addAttributeColumn("text", "Text")
