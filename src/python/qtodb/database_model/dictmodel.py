@@ -1,10 +1,7 @@
-from UserDict import DictMixin
-from PySide.QtCore import QAbstractTableModel, Qt
-from persistent.mapping import PersistentMapping
-from qtodb.database_model.transaction_context_manager import TransactionContextManager
+from PyQt4.QtCore import QAbstractTableModel, Qt
 
 
-class DictModel(QAbstractTableModel, TransactionContextManager):
+class DictModel(QAbstractTableModel):
 
 
     def __init__(self, internal_container=None, parent=None):
@@ -14,7 +11,16 @@ class DictModel(QAbstractTableModel, TransactionContextManager):
         if internal_container is not None:
             self._internal_container = internal_container
         else:
-            self._internal_container = PersistentMapping()
+            self._internal_container = {}
+
+
+    def setHeader(self, header_list):
+        """
+        Set the header labels.
+
+        :param list header_list: list of strings
+        """
+        self._header_display = header_list
 
 
     def __getitem__(self, key):
@@ -43,7 +49,7 @@ class DictModel(QAbstractTableModel, TransactionContextManager):
         return sorted(self._internal_container.keys())
 
 
-    def data(self, model_index, role):
+    def data(self, model_index, role=None):
         if role in [Qt.DisplayRole, Qt.EditRole]:
             key = self.keys()[model_index.row()]
             if model_index.column() == 0:
@@ -59,13 +65,6 @@ class DictModel(QAbstractTableModel, TransactionContextManager):
             return self._header_display[column]
         else:
             return None
-
-
-    #TODO: Rename to removeItem?
-    def removeObject(self, row):
-        with self.openTransaction():
-            keys = self.keys()
-            del self[keys[row]]
 
 
     def __contains__(self, item):

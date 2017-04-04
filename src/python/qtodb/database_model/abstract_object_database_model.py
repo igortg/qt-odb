@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-from PySide import QtCore
-from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PyQt4 import QtCore
+from PyQt4.QtCore import QAbstractTableModel, Qt, QModelIndex
 
 from qtodb.decorators import not_implemented
 
@@ -79,7 +79,7 @@ class AbstractObjectModel(QAbstractTableModel):
                 value = "<N/A>"
             if object_display.format:
                 return object_display.format(value)
-            elif isinstance(value, (str, unicode)):
+            elif isinstance(value, str):
                 return value
             else:
                 return str(value)

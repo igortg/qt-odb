@@ -2,6 +2,7 @@ from qtodb.database_model.abstract_object_database_model import AbstractObjectMo
 
 
 class ObjectListModel(AbstractObjectModel):
+
     def _appendToInternalContainer(self, item):
         self._internal_container.append(item)
 
