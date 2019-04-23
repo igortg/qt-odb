@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-from PyQt4 import QtCore
-from PyQt4.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PyQt5 import QtCore
+from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
 
 from qtodb.decorators import not_implemented
 
@@ -24,8 +24,9 @@ class AbstractObjectModel(QAbstractTableModel):
 
 
     def setInternalContainer(self, internal_container):
+        self.beginResetModel()
         self._internal_container = internal_container
-        self.reset()
+        self.endResetModel()
 
 
     @not_implemented
