@@ -1,4 +1,4 @@
-from PySide.QtCore import SIGNAL, QObject, QDate
+from PyQt5.QtCore import QObject, QDate
 import locale
 import datetime
 from qtodb.reflect.reflective import Reflective
@@ -24,7 +24,7 @@ class UiReflector(object):
 
         updateUi(getattr(instance, attr_name))
         instance.RegisterAttributeReflection(attr_name, updateUi)
-        QObject.connect(widget, SIGNAL("editingFinished()"), updateData)
+        widget.editingFinished.connect(updateData)
         widget_reflections = self._reflections.setdefault(instance, [])
         widget_reflections.append((widget, updateUi, updateData))
 
@@ -80,7 +80,7 @@ class UiReflector(object):
 
         updateUi(getattr(instance, attr_name))
         instance.RegisterAttributeReflection(attr_name, updateUi)
-        QObject.connect(widget, SIGNAL("dateChanged(QDate)"), updateData)
+        widget.dateChanged.connect(updateData)
         widget_reflections = self._reflections.setdefault(instance, [])
         widget_reflections.append((widget, updateUi, updateData))
 
