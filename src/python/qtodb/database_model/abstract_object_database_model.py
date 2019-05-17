@@ -1,3 +1,4 @@
+import warnings
 from collections import namedtuple
 
 from PyQt5 import QtCore
@@ -50,7 +51,7 @@ class AbstractObjectModel(QAbstractTableModel):
 
 
     def appendObject(self, instance):
-        objects_count = len(self._internal_container)
+        objects_count = self.rowCount()
         self.beginInsertRows(QModelIndex(), objects_count, objects_count)
         self._appendToInternalContainer(instance)
         self.endInsertRows()
@@ -79,11 +80,15 @@ class AbstractObjectModel(QAbstractTableModel):
             else:
                 value = "<N/A>"
             if object_display.format:
-                return object_display.format(value)
+                try:
+                    return object_display.format(value)
+                except TypeError as exc:
+                    warnings.warn(f"Error formatting attribute '{object_display.attr_name}': {exc}")
+                    return '<err>'
             elif isinstance(value, str):
                 return value
             else:
-                return str(value)
+                return str(value) if value is not None else '<None>'
         else:
             return None
 
@@ -98,7 +103,3 @@ class AbstractObjectModel(QAbstractTableModel):
     def updateDisplay(self, index):
         sig = QtCore.SIGNAL("dataChanged(const QModelIndex&, const QModelIndex&)")
         self.emit(sig, self.index(index, 0), self.index(index, self.columnCount()))
-
-
-    def __iter__(self):
-        return iter(self._internal_container)
