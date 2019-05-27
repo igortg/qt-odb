@@ -13,21 +13,14 @@ AttributeDisplay = namedtuple("AttributeDisplay", ["attr_name", "header_caption"
 class AbstractObjectModel(QAbstractTableModel):
 
 
-    def __init__(self, internal_container, parent=None):
+    def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
-        self._internal_container = internal_container
         self._object_attributes = []
 
 
     def addAttributeColumn(self, attr_name, header_caption, format_str=None):
         object_display = AttributeDisplay(attr_name, header_caption, format_str)
         self._object_attributes.append(object_display)
-
-
-    def setInternalContainer(self, internal_container):
-        self.beginResetModel()
-        self._internal_container = internal_container
-        self.endResetModel()
 
 
     @not_implemented
@@ -62,10 +55,9 @@ class AbstractObjectModel(QAbstractTableModel):
         self._removeFromInternalContainer(index)
         self.endRemoveRows()
 
-
+    @not_implemented
     def rowCount(self, QModelIndex_parent=None, *args, **kwargs):
-        return len(self._internal_container)
-
+        pass
 
     def columnCount(self, QModelIndex_parent=None, *args, **kwargs):
         return len(self._object_attributes)
