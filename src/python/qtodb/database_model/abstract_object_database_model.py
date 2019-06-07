@@ -1,5 +1,6 @@
 import warnings
 from collections import namedtuple
+from contextlib import contextmanager
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
@@ -83,3 +84,9 @@ class AbstractObjectModel(QAbstractTableModel):
     def updateDisplay(self, index):
         sig = QtCore.SIGNAL("dataChanged(const QModelIndex&, const QModelIndex&)")
         self.emit(sig, self.index(index, 0), self.index(index, self.columnCount()))
+
+    @contextmanager
+    def refreshContext(self):
+        self.beginResetModel()
+        yield
+        self.endResetModel()
