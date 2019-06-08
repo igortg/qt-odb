@@ -7,7 +7,8 @@ from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
 
 from qtodb.decorators import not_implemented
 
-AttributeDisplay = namedtuple("AttributeDisplay", ["attr_name", "header_caption", "format"])
+AttributeDisplay = namedtuple("AttributeDisplay",
+                              ["attr_name", "header_caption", "format", "icon_call"])
 
 
 class AbstractObjectModel(QAbstractTableModel):
@@ -16,8 +17,8 @@ class AbstractObjectModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         self._object_attributes = []
 
-    def addAttributeColumn(self, attr_name, header_caption, format_str=None):
-        object_display = AttributeDisplay(attr_name, header_caption, format_str)
+    def addAttributeColumn(self, attr_name, header_caption, format_str=None, icon_call=None):
+        object_display = AttributeDisplay(attr_name, header_caption, format_str, icon_call)
         self._object_attributes.append(object_display)
 
     @not_implemented
@@ -55,13 +56,17 @@ class AbstractObjectModel(QAbstractTableModel):
         return len(self._object_attributes)
 
     def data(self, model_index, role):
+        object_display = self._object_attributes[model_index.column()]
+        instance = self[model_index.row()]
+        try:
+            value = getattr(instance, object_display.attr_name)
+        except AttributeError:
+            value = None
+
         if role in [Qt.DisplayRole, Qt.EditRole]:
-            object_display = self._object_attributes[model_index.column()]
-            instance = self[model_index.row()]
-            if hasattr(instance, object_display.attr_name):
-                value = getattr(instance, object_display.attr_name)
-            else:
-                value = "<N/A>"
+            if not hasattr(instance, object_display.attr_name):
+                return "<N/A>"
+
             if object_display.format:
                 try:
                     return object_display.format(value)
@@ -71,7 +76,11 @@ class AbstractObjectModel(QAbstractTableModel):
             elif isinstance(value, str):
                 return value
             else:
-                return str(value) if value is not None else '<None>'
+                return str(value) if value is not None else ''
+
+        if role in [Qt.DecorationRole] and object_display.icon_call and value:
+            return object_display.icon_call(value)
+
         else:
             return None
 
